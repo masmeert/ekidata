@@ -18,7 +18,7 @@ This project was created using `bun init` in bun v1.2.21. [Bun](https://bun.com)
 
 ## Data source & attribution
 
-This project uses Japanese station/railway data from **駅データ.jp (ekidata.jp)**.
+This project uses Japanese station/railway data from **[駅データ](ekidata.jp)**.
 
 - Source: https://www.ekidata.jp/
 - Download page: https://www.ekidata.jp/dl/
