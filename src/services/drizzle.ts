@@ -1,7 +1,7 @@
 import * as DrizzlePg from "@effect/sql-drizzle/Pg";
 import { Effect } from "effect";
 
-import * as schema from "@/db/schema";
+import * as schema from "@/db";
 import { PgLive } from "@/services/db";
 
 export class DrizzleService extends Effect.Service<DrizzleService>()(
