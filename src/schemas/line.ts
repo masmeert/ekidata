@@ -22,6 +22,11 @@ export const LineCsvSchema = Schema.Struct({
 	e_sort: NullNum,
 });
 
+const PointSchema = Schema.Struct({
+	x: Schema.Number,
+	y: Schema.Number,
+});
+
 export const LineDbSchema = Schema.Struct({
 	id: Schema.Number,
 	companyId: Schema.Number,
@@ -34,8 +39,7 @@ export const LineDbSchema = Schema.Struct({
 	colorCode: Schema.NullOr(Schema.String),
 	colorText: Schema.NullOr(Schema.String),
 	type: Schema.NullOr(Schema.Number),
-	lon: Schema.NullOr(Schema.Number),
-	lat: Schema.NullOr(Schema.Number),
+	location: Schema.NullOr(PointSchema),
 	zoom: Schema.NullOr(Schema.Number),
 	status: Schema.Literal("active", "pre_opening", "defunct"),
 	sort: Schema.NullOr(Schema.Number),

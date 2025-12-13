@@ -23,6 +23,11 @@ export const StationCsvSchema = Schema.Struct({
 	e_sort: NullNum,
 });
 
+const PointSchema = Schema.Struct({
+	x: Schema.Number,
+	y: Schema.Number,
+});
+
 export const StationDbSchema = Schema.Struct({
 	id: Schema.Number,
 	groupId: Schema.Number,
@@ -35,8 +40,7 @@ export const StationDbSchema = Schema.Struct({
 	prefectureId: Schema.Number,
 	postalCode: Schema.NullOr(Schema.String),
 	address: Schema.NullOr(Schema.String),
-	lon: Schema.NullOr(Schema.Number),
-	lat: Schema.NullOr(Schema.Number),
+	location: Schema.NullOr(PointSchema),
 	openedAt: Schema.NullOr(Schema.String),
 	closedAt: Schema.NullOr(Schema.String),
 	status: Schema.Literal("active", "pre_opening", "defunct"),

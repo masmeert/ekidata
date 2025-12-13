@@ -2,11 +2,11 @@ import { relations } from "drizzle-orm";
 import {
 	boolean,
 	date,
+	geometry,
 	index,
 	integer,
 	pgEnum,
 	pgTable,
-	real,
 	smallint,
 	text,
 	timestamp,
@@ -57,49 +57,55 @@ export const companiesTable = pgTable("companies", {
 	sortOrder: integer("sort_order"),
 });
 
-export const linesTable = pgTable("lines", {
-	id: integer().primaryKey(),
-	companyId: integer("company_id")
-		.notNull()
-		.references(() => companiesTable.id),
-	name: varchar({ length: 256 }).notNull(),
-	nameKana: varchar("name_kana", { length: 256 }),
-	nameFormal: varchar("name_formal", { length: 256 }),
-	nameEn: varchar("name_en", { length: 256 }),
-	nameEnFormal: varchar("name_en_formal", { length: 256 }),
-	colorHex: varchar("color_hex", { length: 8 }),
-	colorName: varchar("color_name", { length: 64 }),
-	type: smallint(),
-	longitude: real(),
-	latitude: real(),
-	mapZoom: smallint("map_zoom"),
-	status: entityStatusEnum().notNull().default("active"),
-	sortOrder: integer("sort_order"),
-});
+export const linesTable = pgTable(
+	"lines",
+	{
+		id: integer().primaryKey(),
+		companyId: integer("company_id")
+			.notNull()
+			.references(() => companiesTable.id),
+		name: varchar({ length: 256 }).notNull(),
+		nameKana: varchar("name_kana", { length: 256 }),
+		nameFormal: varchar("name_formal", { length: 256 }),
+		nameEn: varchar("name_en", { length: 256 }),
+		nameEnFormal: varchar("name_en_formal", { length: 256 }),
+		colorHex: varchar("color_hex", { length: 8 }),
+		colorName: varchar("color_name", { length: 64 }),
+		type: smallint(),
+		location: geometry("location", { type: "point", mode: "xy", srid: 4326 }),
+		mapZoom: smallint("map_zoom"),
+		status: entityStatusEnum().notNull().default("active"),
+		sortOrder: integer("sort_order"),
+	},
+	(t) => [index("lines_location_idx").using("gist", t.location)],
+);
 
-export const stationsTable = pgTable("stations", {
-	id: integer().primaryKey(),
-	groupId: integer("group_id").notNull(),
-	name: varchar({ length: 256 }).notNull(),
-	nameKana: varchar("name_kana", { length: 256 }),
-	nameRomaji: varchar("name_romaji", { length: 256 }),
-	nameEn: varchar("name_en", { length: 256 }),
-	nameEnFormal: varchar("name_en_formal", { length: 256 }),
-	lineId: integer("line_id")
-		.notNull()
-		.references(() => linesTable.id),
-	prefectureId: smallint("prefecture_id")
-		.notNull()
-		.references(() => prefecturesTable.id),
-	postalCode: varchar("postal_code", { length: 16 }),
-	address: text(),
-	longitude: real(),
-	latitude: real(),
-	openedOn: date("opened_on"),
-	closedOn: date("closed_on"),
-	status: entityStatusEnum().notNull().default("active"),
-	sortOrder: integer("sort_order"),
-});
+export const stationsTable = pgTable(
+	"stations",
+	{
+		id: integer().primaryKey(),
+		groupId: integer("group_id").notNull(),
+		name: varchar({ length: 256 }).notNull(),
+		nameKana: varchar("name_kana", { length: 256 }),
+		nameRomaji: varchar("name_romaji", { length: 256 }),
+		nameEn: varchar("name_en", { length: 256 }),
+		nameEnFormal: varchar("name_en_formal", { length: 256 }),
+		lineId: integer("line_id")
+			.notNull()
+			.references(() => linesTable.id),
+		prefectureId: smallint("prefecture_id")
+			.notNull()
+			.references(() => prefecturesTable.id),
+		postalCode: varchar("postal_code", { length: 16 }),
+		address: text(),
+		location: geometry("location", { type: "point", mode: "xy", srid: 4326 }),
+		openedOn: date("opened_on"),
+		closedOn: date("closed_on"),
+		status: entityStatusEnum().notNull().default("active"),
+		sortOrder: integer("sort_order"),
+	},
+	(t) => [index("stations_location_idx").using("gist", t.location)],
+);
 
 export const user = pgTable("user", {
 	id: text("id").primaryKey(),
