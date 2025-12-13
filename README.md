@@ -1,5 +1,7 @@
 # ekidata
 
+Japanese railway data from ekidata.jp CSV files parsed into a SQL database.
+
 ## Setup
 
 To install dependencies:
@@ -14,7 +16,19 @@ To run:
 bun run start
 ```
 
-This project was created using `bun init` in bun v1.2.21. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+## Database
+
+Push the schema to the database:
+
+```bash
+bun run db:push
+```
+
+Other database commands:
+
+- `bun run db:generate` - Generate migrations
+- `bun run db:migrate` - Run migrations
+- `bun run db:studio` - Open Drizzle Studio
 
 ## Data source & attribution
 
