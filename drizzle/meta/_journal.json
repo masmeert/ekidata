@@ -22,6 +22,13 @@
       "when": 1765653061459,
       "tag": "0002_use_postgis",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1765707270917,
+      "tag": "0003_update-schema",
+      "breakpoints": true
     }
   ]
 }

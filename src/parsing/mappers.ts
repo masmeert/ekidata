@@ -48,7 +48,8 @@ export const mapLine = (row: LineCsv) =>
 			colorCode: row.line_color_c,
 			colorText: row.line_color_t,
 			type: row.line_type,
-			location: row.lon != null && row.lat != null ? { x: row.lon, y: row.lat } : null,
+			location:
+				row.lon != null && row.lat != null ? { x: row.lon, y: row.lat } : null,
 			zoom: row.zoom,
 			status: row.e_status,
 			sort: row.e_sort,
@@ -75,7 +76,8 @@ export const mapStation = (row: StationCsv) =>
 			prefectureId: row.pref_cd,
 			postalCode: row.post,
 			address: row.address,
-			location: row.lon != null && row.lat != null ? { x: row.lon, y: row.lat } : null,
+			location:
+				row.lon != null && row.lat != null ? { x: row.lon, y: row.lat } : null,
 			openedAt: row.open_ymd,
 			closedAt: row.close_ymd,
 			status: row.e_status,
