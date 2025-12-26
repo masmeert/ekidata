@@ -27,41 +27,41 @@ class CsvService extends Effect.Service<CsvService>()("CsvService", {
 
 		const parseFile = <A, I>(path: string, schema: Schema.Schema<A, I>) =>
 			pipe(
-			  fs.readFileString(path),
-			  Effect.mapError(() => new CsvFileNotFoundError({ path })),
-			  Effect.flatMap((content) =>
-				Effect.gen(function* () {
-				  const result = Papa.parse(content, {
-					header: true,
-					skipEmptyLines: true,
-					dynamicTyping: false,
-				  });
-		  
-				  const firstError = result.errors[0];
-				  if (firstError) {
-					return yield* Effect.fail(
-					  new CsvParseError({
-						message: firstError.message,
-						row: firstError.row,
-					  }),
-					);
-				  }
-		  
-				  return yield* Effect.forEach(result.data, (row, index) =>
-					pipe(
-					  Schema.decodeUnknown(schema)(row),
-					  Effect.mapError(
-						(e) =>
-						  new CsvValidationError({
-							message: e.message,
-							row: index,
-							data: row as Record<string, string>,
-						  }),
-					  ),
-					),
-				  );
-				}),
-			  ),
+				fs.readFileString(path),
+				Effect.mapError(() => new CsvFileNotFoundError({ path })),
+				Effect.flatMap((content) =>
+					Effect.gen(function* () {
+						const result = Papa.parse(content, {
+							header: true,
+							skipEmptyLines: true,
+							dynamicTyping: false,
+						});
+
+						const firstError = result.errors[0];
+						if (firstError) {
+							return yield* Effect.fail(
+								new CsvParseError({
+									message: firstError.message,
+									row: firstError.row,
+								}),
+							);
+						}
+
+						return yield* Effect.forEach(result.data, (row, index) =>
+							pipe(
+								Schema.decodeUnknown(schema)(row),
+								Effect.mapError(
+									(e) =>
+										new CsvValidationError({
+											message: e.message,
+											row: index,
+											data: row as Record<string, string>,
+										}),
+								),
+							),
+						);
+					}),
+				),
 			);
 
 		return { parseFile };

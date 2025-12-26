@@ -1,6 +1,6 @@
 {
-	"id": "a1eff972-0889-4719-b01a-8010cb2dab7f",
-	"prevId": "00000000-0000-0000-0000-000000000000",
+	"id": "edcbc35a-2f40-45e8-b56a-83a4c62f1bfa",
+	"prevId": "2c996dd0-41b3-47c4-a489-1d096bc2e42a",
 	"version": "7",
 	"dialect": "postgresql",
 	"tables": {
@@ -399,6 +399,122 @@
 			"foreignKeys": {},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.scrape_job": {
+			"name": "scrape_job",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"url": {
+					"name": "url",
+					"type": "varchar(512)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"status": {
+					"name": "status",
+					"type": "scrape_job_status",
+					"typeSchema": "public",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "'pending'"
+				},
+				"attempt_count": {
+					"name": "attempt_count",
+					"type": "smallint",
+					"primaryKey": false,
+					"notNull": true,
+					"default": 0
+				},
+				"last_scraped_at": {
+					"name": "last_scraped_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"next_scrape_at": {
+					"name": "next_scrape_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"error_message": {
+					"name": "error_message",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"scraped_data": {
+					"name": "scraped_data",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {
+				"scrape_job_status_idx": {
+					"name": "scrape_job_status_idx",
+					"columns": [
+						{
+							"expression": "status",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"scrape_job_next_scrape_at_idx": {
+					"name": "scrape_job_next_scrape_at_idx",
+					"columns": [
+						{
+							"expression": "next_scrape_at",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"scrape_job_url_unique": {
+					"name": "scrape_job_url_unique",
+					"nullsNotDistinct": false,
+					"columns": ["url"]
+				}
+			},
 			"policies": {},
 			"checkConstraints": {},
 			"isRLSEnabled": false
@@ -823,12 +939,6 @@
 					"primaryKey": true,
 					"notNull": true
 				},
-				"group_id": {
-					"name": "group_id",
-					"type": "integer",
-					"primaryKey": false,
-					"notNull": true
-				},
 				"name": {
 					"name": "name",
 					"type": "varchar(256)",
@@ -858,12 +968,6 @@
 					"type": "varchar(256)",
 					"primaryKey": false,
 					"notNull": false
-				},
-				"line_id": {
-					"name": "line_id",
-					"type": "integer",
-					"primaryKey": false,
-					"notNull": true
 				},
 				"prefecture_id": {
 					"name": "prefecture_id",
@@ -908,12 +1012,6 @@
 					"primaryKey": false,
 					"notNull": true,
 					"default": "'active'"
-				},
-				"sort_order": {
-					"name": "sort_order",
-					"type": "integer",
-					"primaryKey": false,
-					"notNull": false
 				}
 			},
 			"indexes": {
@@ -934,15 +1032,6 @@
 				}
 			},
 			"foreignKeys": {
-				"station_line_id_line_id_fk": {
-					"name": "station_line_id_line_id_fk",
-					"tableFrom": "station",
-					"tableTo": "line",
-					"columnsFrom": ["line_id"],
-					"columnsTo": ["id"],
-					"onDelete": "no action",
-					"onUpdate": "no action"
-				},
 				"station_prefecture_id_prefecture_id_fk": {
 					"name": "station_prefecture_id_prefecture_id_fk",
 					"tableFrom": "station",
@@ -954,6 +1043,98 @@
 				}
 			},
 			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.station_line": {
+			"name": "station_line",
+			"schema": "",
+			"columns": {
+				"station_id": {
+					"name": "station_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"line_id": {
+					"name": "line_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"original_station_id": {
+					"name": "original_station_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"sort_order": {
+					"name": "sort_order",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				}
+			},
+			"indexes": {
+				"station_line_station_id_idx": {
+					"name": "station_line_station_id_idx",
+					"columns": [
+						{
+							"expression": "station_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"station_line_line_id_idx": {
+					"name": "station_line_line_id_idx",
+					"columns": [
+						{
+							"expression": "line_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"station_line_station_id_station_id_fk": {
+					"name": "station_line_station_id_station_id_fk",
+					"tableFrom": "station_line",
+					"tableTo": "station",
+					"columnsFrom": ["station_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				},
+				"station_line_line_id_line_id_fk": {
+					"name": "station_line_line_id_line_id_fk",
+					"tableFrom": "station_line",
+					"tableTo": "line",
+					"columnsFrom": ["line_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {
+				"station_line_station_id_line_id_pk": {
+					"name": "station_line_station_id_line_id_pk",
+					"columns": ["station_id", "line_id"]
+				}
+			},
 			"uniqueConstraints": {},
 			"policies": {},
 			"checkConstraints": {},
@@ -1085,6 +1266,11 @@
 			"name": "entity_status",
 			"schema": "public",
 			"values": ["active", "pre_opening", "defunct"]
+		},
+		"public.scrape_job_status": {
+			"name": "scrape_job_status",
+			"schema": "public",
+			"values": ["pending", "in_progress", "completed", "failed"]
 		},
 		"public.stamp_shape": {
 			"name": "stamp_shape",

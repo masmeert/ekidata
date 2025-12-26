@@ -42,6 +42,13 @@ export const stampShapeEnum = pgEnum("stamp_shape", [
 	"other",
 ]);
 
+export const scrapeJobStatusEnum = pgEnum("scrape_job_status", [
+	"pending",
+	"in_progress",
+	"completed",
+	"failed",
+]);
+
 export const region = pgTable("region", {
 	id: varchar({ length: 16 }).primaryKey(),
 	name: varchar({ length: 32 }).notNull(),
@@ -201,6 +208,29 @@ export const stamp = pgTable(
 	],
 );
 
+export const scrapeJob = pgTable(
+	"scrape_job",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		url: varchar({ length: 512 }).notNull().unique(),
+		status: scrapeJobStatusEnum().notNull().default("pending"),
+		attemptCount: smallint("attempt_count").notNull().default(0),
+		lastScrapedAt: timestamp("last_scraped_at"),
+		nextScrapeAt: timestamp("next_scrape_at"),
+		errorMessage: text("error_message"),
+		scrapedData: text("scraped_data"),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at")
+			.defaultNow()
+			.$onUpdate(() => new Date())
+			.notNull(),
+	},
+	(t) => [
+		index("scrape_job_status_idx").on(t.status),
+		index("scrape_job_next_scrape_at_idx").on(t.nextScrapeAt),
+	],
+);
+
 export const user = pgTable("user", {
 	id: text("id").primaryKey(),
 	name: text("name").notNull(),
@@ -255,16 +285,13 @@ export const regionRelations = relations(region, ({ many }) => ({
 	prefecture: many(prefecture),
 }));
 
-export const prefectureRelations = relations(
-	prefecture,
-	({ one, many }) => ({
-		region: one(region, {
-			fields: [prefecture.regionId],
-			references: [region.id],
-		}),
-		station: many(station),
+export const prefectureRelations = relations(prefecture, ({ one, many }) => ({
+	region: one(region, {
+		fields: [prefecture.regionId],
+		references: [region.id],
 	}),
-);
+	station: many(station),
+}));
 
 export const companyRelations = relations(company, ({ many }) => ({
 	line: many(line),
